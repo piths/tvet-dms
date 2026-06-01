@@ -7,7 +7,6 @@ import {
   ShieldAlertIcon,
   SettingsIcon,
   GraduationCapIcon,
-  PanelLeft,
 } from "lucide-react"
 
 import { useSession } from "@/components/session-provider"
@@ -21,13 +20,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 
 function TrainerSidebarContent() {
   const session = useSession()
-  const { toggleSidebar } = useSidebar()
 
   const navItems = [
     { title: "My Profile", url: "/my-portal", icon: UserIcon },
@@ -37,22 +33,24 @@ function TrainerSidebarContent() {
   ]
 
   return (
-    <Sidebar collapsible="offcanvas" variant="inset">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center justify-between">
-              <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5 flex-1">
-                <a href="/my-portal">
-                  <GraduationCapIcon className="h-5 w-5" />
-                  <span className="text-base font-semibold">Trainer Portal</span>
-                </a>
-              </SidebarMenuButton>
-              <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-8 w-8 shrink-0">
-                <PanelLeft className="h-4 w-4" />
-                <span className="sr-only">Toggle Sidebar</span>
-              </Button>
-            </div>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <a href="/my-portal">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <GraduationCapIcon className="h-4 w-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">Trainer Portal</span>
+                  <span className="text-[10px] text-sidebar-foreground/60">Self-Service</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -74,7 +72,7 @@ function TrainerSidebarContent() {
 
 export function TrainerSidebar() {
   return (
-    <Suspense fallback={<div className="w-64 bg-sidebar" />}>
+    <Suspense fallback={<div className="w-60 bg-sidebar" />}>
       <TrainerSidebarContent />
     </Suspense>
   )

@@ -9,7 +9,6 @@ import {
   BarChartIcon,
   SettingsIcon,
   CircleHelpIcon,
-  PanelLeft,
   GraduationCapIcon,
   ArrowRightLeftIcon,
   ClipboardListIcon,
@@ -30,9 +29,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 import type { PermissionCode } from "@/lib/types"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {}
@@ -47,7 +44,6 @@ interface NavItem {
 function AppSidebarContent({ ...props }: AppSidebarProps) {
   const session = useSession()
   const { has } = usePermissions()
-  const { toggleSidebar } = useSidebar()
 
   // Build nav items based on permissions
   const allItems: NavItem[] = [
@@ -80,31 +76,25 @@ function AppSidebarContent({ ...props }: AppSidebarProps) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center justify-between">
-              <SidebarMenuButton
-                asChild
-                className="data-[slot=sidebar-menu-button]:!p-1.5 flex-1"
-              >
-                <a href="/dashboard">
-                  <GraduationCapIcon className="h-5 w-5" />
-                  <span className="text-base font-semibold">TVET DMS</span>
-                </a>
-              </SidebarMenuButton>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebar}
-                className="h-8 w-8 shrink-0"
-              >
-                <PanelLeft className="h-4 w-4" />
-                <span className="sr-only">Toggle Sidebar</span>
-              </Button>
-            </div>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <a href="/dashboard">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <GraduationCapIcon className="h-4 w-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">TVET DMS</span>
+                  <span className="text-[10px] text-sidebar-foreground/60">Management System</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} label="Navigation" />
+        <NavMain items={navItems} label="Platform" />
         <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

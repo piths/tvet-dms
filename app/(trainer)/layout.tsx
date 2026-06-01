@@ -25,7 +25,7 @@ export default async function TrainerLayout({
       <SidebarProvider
         style={
           {
-            "--sidebar-width": "16rem",
+            "--sidebar-width": "15rem",
             "--header-height": "calc(var(--spacing) * 12)",
           } as React.CSSProperties
         }

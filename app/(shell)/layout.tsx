@@ -25,12 +25,12 @@ export default async function ShellLayout({
       <SidebarProvider
         style={
           {
-            "--sidebar-width": "16rem",
+            "--sidebar-width": "15rem",
             "--header-height": "calc(var(--spacing) * 12)",
           } as React.CSSProperties
         }
       >
-        <AppSidebar variant="inset" />
+        <AppSidebar />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
       <Toaster />

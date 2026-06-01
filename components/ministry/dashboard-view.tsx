@@ -56,11 +56,19 @@ interface Props {
 }
 
 const COLORS = [
-  "oklch(0.45 0.1 200)",   // teal
-  "oklch(0.6 0.15 330)",   // pink
-  "oklch(0.55 0.12 80)",   // amber
-  "oklch(0.5 0.15 270)",   // purple
-  "oklch(0.6 0.12 150)",   // green
+  "oklch(0.65 0.22 350)",   // pink/magenta (primary)
+  "oklch(0.6 0.18 150)",    // green
+  "oklch(0.6 0.15 270)",    // purple
+  "oklch(0.65 0.15 80)",    // amber/orange
+  "oklch(0.55 0.15 200)",   // teal
+]
+
+const KPI_ICON_COLORS = [
+  { bg: "bg-rose-500/15 dark:bg-rose-500/20", text: "text-rose-600 dark:text-rose-400" },
+  { bg: "bg-emerald-500/15 dark:bg-emerald-500/20", text: "text-emerald-600 dark:text-emerald-400" },
+  { bg: "bg-violet-500/15 dark:bg-violet-500/20", text: "text-violet-600 dark:text-violet-400" },
+  { bg: "bg-amber-500/15 dark:bg-amber-500/20", text: "text-amber-600 dark:text-amber-400" },
+  { bg: "bg-sky-500/15 dark:bg-sky-500/20", text: "text-sky-600 dark:text-sky-400" },
 ]
 
 export function DashboardView({
@@ -186,36 +194,35 @@ export function DashboardView({
           label="Total Enrolment"
           value={totalEnrolment.toLocaleString()}
           sub={`${totalMale} M · ${totalFemale} F`}
-          trend={`${totalPWD} PWD`}
+          colorIndex={0}
         />
         <KPICard
           icon={UsersIcon}
           label="Staff"
           value={totalStaff.toLocaleString()}
           sub={`${totalTrainers} trainers`}
-          trend={`${institutions.length} institutions`}
+          colorIndex={1}
         />
         <KPICard
           icon={BanknoteIcon}
           label="Capitation"
           value={`${capPct}%`}
           sub={`KES ${(capReceived / 1e6).toFixed(1)}M of ${(capExpected / 1e6).toFixed(1)}M`}
-          trend={capPct >= 80 ? "On track" : "Below target"}
-          trendDown={capPct < 80}
+          colorIndex={2}
         />
         <KPICard
           icon={ClipboardCheckIcon}
           label="Returns"
           value={`${returnsPct}%`}
           sub={`${submittedReturns} of ${institutions.length} submitted`}
-          trend={openCycle?.name ?? ""}
+          colorIndex={3}
         />
         <KPICard
           icon={ArrowRightLeftIcon}
-          label="Transfers"
+          label="Pending Transfers"
           value={pendingTransfers.toString()}
-          sub="pending approval"
-          trend={`${transfers.length} total`}
+          sub={`${transfers.length} total applications`}
+          colorIndex={4}
           className="hidden xl:flex"
         />
       </div>
@@ -513,37 +520,26 @@ function KPICard({
   label,
   value,
   sub,
-  trend,
-  trendDown,
+  colorIndex = 0,
   className,
 }: {
   icon: any
   label: string
   value: string
   sub: string
-  trend?: string
-  trendDown?: boolean
+  colorIndex?: number
   className?: string
 }) {
+  const color = KPI_ICON_COLORS[colorIndex % KPI_ICON_COLORS.length]
   return (
     <Card className={`relative overflow-hidden ${className ?? ""}`}>
       <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="rounded-md bg-primary/10 p-2">
-            <Icon className="h-4 w-4 text-primary" />
-          </div>
-          {trend && (
-            <Badge
-              variant="secondary"
-              className={`text-[10px] ${trendDown ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" : ""}`}
-            >
-              {trend}
-            </Badge>
-          )}
+        <div className={`inline-flex rounded-xl p-2.5 ${color.bg}`}>
+          <Icon className={`h-5 w-5 ${color.text}`} />
         </div>
         <div className="mt-3">
           <p className="text-2xl font-bold tabular-nums">{value}</p>
-          <p className="text-xs text-muted-foreground">{label}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
         </div>
         <p className="mt-1 text-[11px] text-muted-foreground">{sub}</p>
       </CardContent>
