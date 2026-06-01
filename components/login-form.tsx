@@ -21,7 +21,7 @@ const DEMO_ACCOUNTS = [
   { label: "Trainer", email: "pithon.kariuki@minap.ac.ke", icon: GraduationCapIcon, color: "text-purple-600" },
 ]
 
-const DEMO_PASSWORD = "Tvet@2026"
+const DEMO_PASSWORD = "123456"
 
 export function LoginForm({
   className,
