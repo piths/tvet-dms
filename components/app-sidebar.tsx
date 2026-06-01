@@ -15,6 +15,7 @@ import {
   ClipboardListIcon,
   MapPinIcon,
   ShieldAlertIcon,
+  BriefcaseIcon,
   type LucideIcon,
 } from "lucide-react"
 
@@ -58,6 +59,7 @@ function AppSidebarContent({ ...props }: AppSidebarProps) {
     { title: "Staff Registry", url: "/staff-registry", icon: UsersIcon, permission: "staff.view" },
     { title: "Counties", url: "/counties", icon: MapPinIcon, permission: "dashboard.view" },
     { title: "Disciplinary", url: "/disciplinary", icon: ShieldAlertIcon, permission: "disciplinary.view" },
+    { title: "Recruitment", url: "/recruitment", icon: BriefcaseIcon, permission: "staff.edit" },
     { title: "Reports", url: "/reports", icon: BarChartIcon, permission: "dashboard.view" },
   ]
 
