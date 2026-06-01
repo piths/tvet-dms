@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { PageHeader } from "@/components/page-header"
 import { DashboardView } from "@/components/ministry/dashboard-view"
 import { Button } from "@/components/ui/button"
-import { DownloadIcon } from "lucide-react"
+import { RefreshCwIcon } from "lucide-react"
 import Link from "next/link"
 
 export default async function DashboardPage() {
@@ -43,14 +43,6 @@ export default async function DashboardPage() {
       <PageHeader
         title="National Overview"
         description={`Ministry KPI Dashboard — ${openCycle?.name ?? "At Your Fingertips"}`}
-        actions={
-          <Link href="/reports">
-            <Button variant="outline" size="sm">
-              <DownloadIcon className="mr-1.5 h-3.5 w-3.5" />
-              Export to KEMIS
-            </Button>
-          </Link>
-        }
       />
       <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         <DashboardView

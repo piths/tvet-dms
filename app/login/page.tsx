@@ -13,7 +13,10 @@ export default function LoginPage() {
             <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GraduationCapIcon className="size-4" />
             </div>
-            <span className="text-lg font-semibold">TVET DMS</span>
+            <div>
+              <span className="text-base font-semibold leading-none">TVET DMS</span>
+              <span className="block text-[10px] text-muted-foreground leading-tight">State Department for TVET</span>
+            </div>
           </a>
           <ThemeToggle />
         </div>

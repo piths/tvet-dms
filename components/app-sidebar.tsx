@@ -52,29 +52,50 @@ function AppSidebarContent({ ...props }: AppSidebarProps) {
   const { has } = usePermissions()
   const { toggleSidebar } = useSidebar()
 
-  // Build nav items based on permissions
-  const allItems: NavItem[] = [
+  // Build nav items in groups based on permissions
+  const overviewItems: NavItem[] = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboardIcon, permission: "dashboard.view" },
+  ]
+
+  const dataItems: NavItem[] = [
     { title: "Institutions", url: "/institutions", icon: Building2, permission: "enrolment.view" },
-    { title: "Returns", url: "/returns", icon: ClipboardListIcon, permission: "return.view" },
+    { title: "Staff Registry", url: "/staff-registry", icon: UsersIcon, permission: "staff.view" },
+    { title: "Counties", url: "/counties", icon: MapPinIcon, permission: "dashboard.view" },
+  ]
+
+  const hrItems: NavItem[] = [
     { title: "Transfers", url: "/transfers", icon: ArrowRightLeftIcon, permission: "transfer.endorse" },
     { title: "Recruitment", url: "/recruitment", icon: BriefcaseIcon, permission: "staff.edit" },
     { title: "Promotions", url: "/promotions", icon: TrendingUpIcon, permission: "staff.view" },
-    { title: "Staff Registry", url: "/staff-registry", icon: UsersIcon, permission: "staff.view" },
+  ]
+
+  const complianceItems: NavItem[] = [
+    { title: "Returns", url: "/returns", icon: ClipboardListIcon, permission: "return.view" },
     { title: "Disciplinary", url: "/disciplinary", icon: ShieldAlertIcon, permission: "disciplinary.view" },
     { title: "Quality Assurance", url: "/quality-assurance", icon: ShieldCheckIcon, permission: "dashboard.view" },
-    { title: "Counties", url: "/counties", icon: MapPinIcon, permission: "dashboard.view" },
+  ]
+
+  const reportItems: NavItem[] = [
     { title: "Reports", url: "/reports", icon: BarChartIcon, permission: "dashboard.view" },
   ]
 
-  // Also allow transfer.review and transfer.approve to see transfers
-  const navItems = allItems.filter((item) => {
-    if (!item.permission) return true
-    if (item.url === "/transfers") {
-      return has("transfer.endorse") || has("transfer.review") || has("transfer.approve")
-    }
-    return has(item.permission)
-  })
+  function filterItems(items: NavItem[]) {
+    return items.filter((item) => {
+      if (!item.permission) return true
+      if (item.url === "/transfers") {
+        return has("transfer.endorse") || has("transfer.review") || has("transfer.approve")
+      }
+      return has(item.permission)
+    })
+  }
+
+  const groups = [
+    { label: "Overview", items: filterItems(overviewItems) },
+    { label: "Data", items: filterItems(dataItems) },
+    { label: "HR Management", items: filterItems(hrItems) },
+    { label: "Compliance", items: filterItems(complianceItems) },
+    { label: "Reporting", items: filterItems(reportItems) },
+  ].filter((g) => g.items.length > 0)
 
   const navSecondary = [
     { title: "Settings", url: "/settings", icon: SettingsIcon },
@@ -93,7 +114,10 @@ function AppSidebarContent({ ...props }: AppSidebarProps) {
               >
                 <a href="/dashboard">
                   <GraduationCapIcon className="h-5 w-5" />
-                  <span className="text-base font-semibold">TVET DMS</span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold leading-none">TVET DMS</span>
+                    <span className="text-[10px] text-sidebar-foreground/60 leading-tight">State Department for TVET</span>
+                  </div>
                 </a>
               </SidebarMenuButton>
               <Button
@@ -110,7 +134,9 @@ function AppSidebarContent({ ...props }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} label="Navigation" />
+        {groups.map((group) => (
+          <NavMain key={group.label} items={group.items} label={group.label} />
+        ))}
         <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

@@ -144,3 +144,80 @@
     @apply font-sans;
   }
 }
+
+/* ─── Print Stylesheet ──────────────────────────────────────────────────────── */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12px;
+  }
+
+  /* Hide non-printable elements */
+  [data-slot="sidebar"],
+  [data-sidebar],
+  nav,
+  .no-print,
+  button,
+  [role="dialog"],
+  .toaster {
+    display: none !important;
+  }
+
+  /* Full width content */
+  main,
+  [data-slot="sidebar-inset"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Clean cards for print */
+  [data-slot="card"] {
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  /* Tables */
+  table {
+    width: 100% !important;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #ccc !important;
+    padding: 4px 8px !important;
+  }
+
+  /* Page header for print */
+  .print-header {
+    display: block !important;
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #1F3864;
+  }
+
+  .print-header h1 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1F3864;
+  }
+
+  .print-header p {
+    font-size: 11px;
+    color: #666;
+  }
+
+  /* Page breaks */
+  .page-break {
+    page-break-before: always;
+  }
+
+  /* Charts - ensure they render */
+  svg {
+    max-width: 100% !important;
+  }
+}
