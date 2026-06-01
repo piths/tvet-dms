@@ -16,6 +16,8 @@ import {
   MapPinIcon,
   ShieldAlertIcon,
   BriefcaseIcon,
+  TrendingUpIcon,
+  ShieldCheckIcon,
   type LucideIcon,
 } from "lucide-react"
 
@@ -60,6 +62,8 @@ function AppSidebarContent({ ...props }: AppSidebarProps) {
     { title: "Counties", url: "/counties", icon: MapPinIcon, permission: "dashboard.view" },
     { title: "Disciplinary", url: "/disciplinary", icon: ShieldAlertIcon, permission: "disciplinary.view" },
     { title: "Recruitment", url: "/recruitment", icon: BriefcaseIcon, permission: "staff.edit" },
+    { title: "Promotions", url: "/promotions", icon: TrendingUpIcon, permission: "staff.view" },
+    { title: "Quality Assurance", url: "/quality-assurance", icon: ShieldCheckIcon, permission: "dashboard.view" },
     { title: "Reports", url: "/reports", icon: BarChartIcon, permission: "dashboard.view" },
   ]
 
