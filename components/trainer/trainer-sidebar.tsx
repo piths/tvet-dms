@@ -8,6 +8,7 @@ import {
   SettingsIcon,
   GraduationCapIcon,
   PanelLeft,
+  TrendingUpIcon,
 } from "lucide-react"
 
 import { useSession } from "@/components/session-provider"
@@ -32,6 +33,7 @@ function TrainerSidebarContent() {
   const navItems = [
     { title: "My Profile", url: "/my-portal", icon: UserIcon },
     { title: "My Transfers", url: "/my-portal/transfers", icon: ArrowRightLeftIcon },
+    { title: "My Promotions", url: "/my-portal/promotions", icon: TrendingUpIcon },
     { title: "My Cases", url: "/my-portal/cases", icon: ShieldAlertIcon },
     { title: "Settings", url: "/my-portal/settings", icon: SettingsIcon },
   ]

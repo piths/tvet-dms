@@ -55,6 +55,53 @@ export async function GET(request: Request) {
       }
       break
     }
+    case "recruitment": {
+      const { data } = await supabase
+        .from("recruitment")
+        .select("*, institution:institution_id(name), applicants:recruitment_applicant(id, status)")
+        .order("created_at", { ascending: false })
+      csv = "Institution,Vacancy,Job Group,Positions,Applications,Shortlisted,Appointed,Status,Closing Date\n"
+      for (const row of data ?? []) {
+        const apps = row.applicants ?? []
+        csv += `"${row.institution?.name ?? ""}","${row.title}","${row.job_group ?? ""}",${row.positions_available},${apps.length},${apps.filter((a: any) => a.status === "shortlisted").length},${apps.filter((a: any) => a.status === "appointed").length},"${row.status}","${row.closing_date ?? ""}"\n`
+      }
+      break
+    }
+    case "promotions": {
+      const { data } = await supabase
+        .from("promotion")
+        .select("*, staff:staff_id(first_name, last_name), institution:institution_id(name)")
+        .order("created_at", { ascending: false })
+      csv = "Trainer,Institution,From Group,To Group,Years in Grade,Basis,Status,Effective Date\n"
+      for (const row of data ?? []) {
+        const name = row.staff ? `${row.staff.first_name} ${row.staff.last_name}` : ""
+        csv += `"${name}","${row.institution?.name ?? ""}","${row.from_job_group}","${row.to_job_group}",${row.years_in_grade ?? ""},"${row.basis ?? ""}","${row.status}","${row.effective_date ?? ""}"\n`
+      }
+      break
+    }
+    case "disciplinary": {
+      const { data } = await supabase
+        .from("disciplinary_case")
+        .select("*, staff:staff_id(first_name, last_name), institution:institution_id(name)")
+        .order("created_at", { ascending: false })
+      csv = "Staff,Institution,Case Type,Status,Sanction,Opened,Resolved,Visible to Trainer\n"
+      for (const row of data ?? []) {
+        const name = row.staff ? `${row.staff.first_name} ${row.staff.last_name}` : ""
+        csv += `"${name}","${row.institution?.name ?? ""}","${row.case_type ?? ""}","${row.status}","${row.sanction ?? ""}","${row.opened_at ?? ""}","${row.resolved_at ?? ""}","${row.visible_to_trainer}"\n`
+      }
+      break
+    }
+    case "qa": {
+      const { data } = await supabase
+        .from("qa_assessment")
+        .select("*, institution:institution_id(name)")
+        .order("assessment_date", { ascending: false })
+      csv = "Institution,Category,Title,Assessor,Date,Score,Compliance,Status\n"
+      for (const row of data ?? []) {
+        csv += `"${row.institution?.name ?? ""}","${row.category}","${row.title}","${row.assessor_name ?? ""}","${row.assessment_date ?? ""}",${row.overall_score ?? ""},"${row.compliance_level ?? ""}","${row.status}"\n`
+      }
+      break
+    }
     default:
       return NextResponse.json({ error: "Invalid report type" }, { status: 400 })
   }

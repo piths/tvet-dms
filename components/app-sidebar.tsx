@@ -58,12 +58,12 @@ function AppSidebarContent({ ...props }: AppSidebarProps) {
     { title: "Institutions", url: "/institutions", icon: Building2, permission: "enrolment.view" },
     { title: "Returns", url: "/returns", icon: ClipboardListIcon, permission: "return.view" },
     { title: "Transfers", url: "/transfers", icon: ArrowRightLeftIcon, permission: "transfer.endorse" },
-    { title: "Staff Registry", url: "/staff-registry", icon: UsersIcon, permission: "staff.view" },
-    { title: "Counties", url: "/counties", icon: MapPinIcon, permission: "dashboard.view" },
-    { title: "Disciplinary", url: "/disciplinary", icon: ShieldAlertIcon, permission: "disciplinary.view" },
     { title: "Recruitment", url: "/recruitment", icon: BriefcaseIcon, permission: "staff.edit" },
     { title: "Promotions", url: "/promotions", icon: TrendingUpIcon, permission: "staff.view" },
+    { title: "Staff Registry", url: "/staff-registry", icon: UsersIcon, permission: "staff.view" },
+    { title: "Disciplinary", url: "/disciplinary", icon: ShieldAlertIcon, permission: "disciplinary.view" },
     { title: "Quality Assurance", url: "/quality-assurance", icon: ShieldCheckIcon, permission: "dashboard.view" },
+    { title: "Counties", url: "/counties", icon: MapPinIcon, permission: "dashboard.view" },
     { title: "Reports", url: "/reports", icon: BarChartIcon, permission: "dashboard.view" },
   ]
 

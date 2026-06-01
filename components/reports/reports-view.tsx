@@ -58,6 +58,10 @@ export function ReportsView() {
     { id: "staffing", title: "Staffing Report", description: "Staff register by institution, category, and qualification", icon: FileSpreadsheetIcon },
     { id: "finance", title: "Financial Summary", description: "Capitation and budget data by institution and period", icon: FileSpreadsheetIcon },
     { id: "returns", title: "Returns Compliance", description: "Return submission status across all institutions", icon: FileSpreadsheetIcon },
+    { id: "recruitment", title: "Recruitment Pipeline", description: "Vacancy postings, applicants, and appointment status", icon: FileSpreadsheetIcon },
+    { id: "promotions", title: "Promotions Register", description: "Trainer promotions by institution, job group, and status", icon: FileSpreadsheetIcon },
+    { id: "disciplinary", title: "Disciplinary Summary", description: "Active and resolved cases by institution (sensitive)", icon: FileSpreadsheetIcon },
+    { id: "qa", title: "QA Compliance", description: "Quality assurance scores by institution and category", icon: FileSpreadsheetIcon },
   ]
 
   return (
