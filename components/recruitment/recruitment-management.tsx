@@ -248,7 +248,9 @@ export function RecruitmentManagement({ recruitments, userTier, userId, userName
                     <TableRow key={r.id}>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{r.title}</p>
+                          <Link href={`/recruitment/${r.id}`} className="font-medium text-primary hover:underline">
+                            {r.title}
+                          </Link>
                           {r.department && <p className="text-xs text-muted-foreground">{r.department}</p>}
                         </div>
                       </TableCell>

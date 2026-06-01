@@ -28,6 +28,7 @@ import {
 } from "lucide-react"
 import { staffFullName } from "@/lib/types"
 import type { UserTier } from "@/lib/types"
+import Link from "next/link"
 
 interface CaseRow {
   id: string
@@ -263,9 +264,11 @@ export function DisciplinaryManagement({ cases, staffList, userTier, userId, use
                       </TableCell>
                       {canManage && (
                         <TableCell>
-                          <Button size="sm" variant="ghost" onClick={() => setSelectedCase(c)}>
-                            <EyeIcon className="h-3.5 w-3.5" />
-                          </Button>
+                          <Link href={`/disciplinary/${c.id}`}>
+                            <Button size="sm" variant="ghost">
+                              <EyeIcon className="h-3.5 w-3.5" />
+                            </Button>
+                          </Link>
                         </TableCell>
                       )}
                     </TableRow>
