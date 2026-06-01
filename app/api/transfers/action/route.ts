@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { logAudit } from "@/lib/audit"
+import { logNotification } from "@/lib/notify"
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -95,6 +96,26 @@ export async function POST(request: Request) {
     before: transfer,
     after: { ...transfer, ...updateData },
   })
+
+  // Notify trainer on final decision
+  if (newStatus === "approved" || newStatus === "rejected") {
+    const { data: staffUser } = await admin
+      .from("app_user")
+      .select("id, email")
+      .eq("staff_id", transfer.staff_id)
+      .single()
+    if (staffUser?.email) {
+      await logNotification({
+        recipientEmail: staffUser.email,
+        recipientUserId: staffUser.id,
+        subject: `Transfer ${newStatus === "approved" ? "Approved" : "Rejected"}: ${transfer.reference_no ?? ""}`,
+        body: `Your transfer application ${transfer.reference_no ?? ""} has been ${newStatus}. ${comments ? `Comments: ${comments}` : ""}`,
+        triggerType: `transfer_${newStatus}`,
+        entityType: "transfer_application",
+        entityId: transferId,
+      })
+    }
+  }
 
   return NextResponse.json({ success: true })
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { logAudit } from "@/lib/audit"
+import { logNotification, findRecipient } from "@/lib/notify"
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -85,6 +86,40 @@ export async function POST(request: Request) {
     before: current,
     after: { ...current, ...update },
   })
+
+  // Log notifications
+  const admin2 = createAdminClient()
+  const { data: inst } = await admin2.from("institution").select("name, county_id").eq("id", current.institution_id).single()
+
+  if (action === "submit" && inst) {
+    const county = await findRecipient("county", inst.county_id)
+    if (county) {
+      await logNotification({
+        recipientEmail: county.email,
+        recipientUserId: county.id,
+        subject: `Return Submitted: ${inst.name}`,
+        body: `${inst.name} has submitted their return for verification.`,
+        triggerType: "return_submitted",
+        entityType: "institution_return",
+        entityId: returnId,
+      })
+    }
+  } else if ((action === "verify" || action === "return") && inst) {
+    const principal = await findRecipient("institution", null, current.institution_id)
+    if (principal) {
+      await logNotification({
+        recipientEmail: principal.email,
+        recipientUserId: principal.id,
+        subject: action === "verify" ? `Return Verified: ${inst.name}` : `Return Returned: ${inst.name}`,
+        body: action === "verify"
+          ? `Your institution's return has been verified by the county.`
+          : `Your return has been sent back for correction. Reason: ${reason}`,
+        triggerType: action === "verify" ? "return_verified" : "return_returned",
+        entityType: "institution_return",
+        entityId: returnId,
+      })
+    }
+  }
 
   return NextResponse.json({ success: true })
 }

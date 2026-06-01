@@ -3,9 +3,7 @@ import { getSessionUser } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { PageHeader } from "@/components/page-header"
 import { DashboardView } from "@/components/ministry/dashboard-view"
-import { Button } from "@/components/ui/button"
-import { RefreshCwIcon } from "lucide-react"
-import Link from "next/link"
+import { ActivityFeed } from "@/components/ministry/activity-feed"
 
 export default async function DashboardPage() {
   const session = await getSessionUser()
@@ -23,6 +21,7 @@ export default async function DashboardPage() {
     { data: returns },
     { data: transfers },
     { data: infrastructure },
+    { data: auditEvents },
   ] = await Promise.all([
     supabase.from("enrolment").select("*, programme:programme_id(name), institution:institution_id(name)"),
     supabase.from("staff").select("*, institution:institution_id(name)"),
@@ -36,6 +35,7 @@ export default async function DashboardPage() {
       .order("submitted_at", { ascending: false, nullsFirst: false }),
     supabase.from("transfer_application").select("id, status, created_at"),
     supabase.from("infrastructure").select("id, item_type, condition, institution_id"),
+    supabase.from("audit_event").select("id, actor_name, action, entity_type, created_at").order("created_at", { ascending: false }).limit(15),
   ])
 
   return (
@@ -56,6 +56,7 @@ export default async function DashboardPage() {
           infrastructure={infrastructure ?? []}
           openCycle={openCycle}
         />
+        <ActivityFeed events={auditEvents ?? []} />
       </div>
     </>
   )
