@@ -3,6 +3,7 @@ import { getSessionUser } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { PageHeader } from "@/components/page-header"
 import { CountyCards } from "@/components/counties/county-cards"
+import { KenyaMap } from "@/components/counties/kenya-map"
 
 export default async function CountiesPage() {
   const session = await getSessionUser()
@@ -15,12 +16,6 @@ export default async function CountiesPage() {
   const { data: enrolments } = await supabase.from("enrolment").select("institution_id, male_count, female_count")
   const { data: staff } = await supabase.from("staff").select("institution_id, category")
   const { data: returns } = await supabase.from("institution_return").select("institution_id, status")
-
-  // Build institution → county map
-  const instCountyMap: Record<string, number> = {}
-  for (const i of institutions ?? []) {
-    if (i.county_id) instCountyMap[i.id] = i.county_id
-  }
 
   // Aggregate per county
   const countyData = (counties ?? []).map((c: any) => {
@@ -43,10 +38,19 @@ export default async function CountiesPage() {
     }
   })
 
+  // Map data
+  const mapData = countyData.map((c: any) => ({
+    id: c.id,
+    name: c.name,
+    institutions: c.institutionCount,
+    enrolment: c.totalEnrolment,
+  }))
+
   return (
     <>
-      <PageHeader title="Counties" description={`${(counties ?? []).length} counties`} />
-      <div className="flex flex-1 flex-col gap-4 p-4 lg:p-6">
+      <PageHeader title="Counties" description={`${(counties ?? []).length} counties · ${(institutions ?? []).length} institutions nationwide`} />
+      <div className="flex flex-1 flex-col gap-6 p-4 lg:p-6">
+        <KenyaMap counties={mapData} />
         <CountyCards counties={countyData} />
       </div>
     </>

@@ -45,6 +45,13 @@ import {
 import { useState } from "react"
 import { PeriodSelector } from "@/components/period-selector"
 import { getCurrentTerm, getCurrentQuarter, getCurrentFY } from "@/lib/periods"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface Props {
   enrolments: any[]
@@ -125,37 +132,39 @@ export function DashboardView({
     { name: "Management", value: totalManagement, fill: COLORS[3] },
   ]
 
-  // Enrolment by institution
-  const enrolByInst = institutions.map((inst: any) => {
-    const instEnrolments = enrolments.filter((e: any) => e.institution_id === inst.id)
+  // Enrolment aggregated BY COUNTY (not per institution)
+  const enrolByCounty = counties.map((county: any) => {
+    const countyInstIds = institutions.filter((i: any) => i.county?.name === county.name || i.county_id === county.id).map((i: any) => i.id)
+    const countyEnrolments = enrolments.filter((e: any) => countyInstIds.includes(e.institution_id))
     return {
-      name: inst.name.length > 20 ? inst.name.slice(0, 20) + "…" : inst.name,
-      fullName: inst.name,
-      male: instEnrolments.reduce((s: number, e: any) => s + (e.male_count || 0), 0),
-      female: instEnrolments.reduce((s: number, e: any) => s + (e.female_count || 0), 0),
-      pwd: instEnrolments.reduce((s: number, e: any) => s + (e.pwd_count || 0), 0),
+      name: county.name,
+      male: countyEnrolments.reduce((s: number, e: any) => s + (e.male_count || 0), 0),
+      female: countyEnrolments.reduce((s: number, e: any) => s + (e.female_count || 0), 0),
+      pwd: countyEnrolments.reduce((s: number, e: any) => s + (e.pwd_count || 0), 0),
     }
-  })
+  }).sort((a: any, b: any) => (b.male + b.female) - (a.male + a.female)).slice(0, 10)
 
-  // Capitation by institution
-  const capByInst = institutions.map((inst: any) => {
-    const instFin = financials.filter((f: any) => f.institution_id === inst.id)
+  // Capitation BY COUNTY (top 10)
+  const capByCounty = counties.map((county: any) => {
+    const countyInstIds = institutions.filter((i: any) => i.county?.name === county.name || i.county_id === county.id).map((i: any) => i.id)
+    const countyFin = financials.filter((f: any) => countyInstIds.includes(f.institution_id))
     return {
-      name: inst.name.length > 20 ? inst.name.slice(0, 20) + "…" : inst.name,
-      expected: instFin.reduce((s: number, f: any) => s + Number(f.capitation_expected || 0), 0) / 1e6,
-      received: instFin.reduce((s: number, f: any) => s + Number(f.capitation_received || 0), 0) / 1e6,
+      name: county.name,
+      expected: countyFin.reduce((s: number, f: any) => s + Number(f.capitation_expected || 0), 0) / 1e6,
+      received: countyFin.reduce((s: number, f: any) => s + Number(f.capitation_received || 0), 0) / 1e6,
     }
-  })
+  }).sort((a: any, b: any) => b.expected - a.expected).slice(0, 10)
 
-  // Budget utilisation
-  const budgetData = institutions.map((inst: any) => {
-    const instFin = financials.filter((f: any) => f.institution_id === inst.id)
+  // Budget utilisation BY COUNTY (top 10)
+  const budgetByCounty = counties.map((county: any) => {
+    const countyInstIds = institutions.filter((i: any) => i.county?.name === county.name || i.county_id === county.id).map((i: any) => i.id)
+    const countyFin = financials.filter((f: any) => countyInstIds.includes(f.institution_id))
     return {
-      name: inst.name.length > 20 ? inst.name.slice(0, 20) + "…" : inst.name,
-      budget: instFin.reduce((s: number, f: any) => s + Number(f.budget_allocated || 0), 0) / 1e6,
-      expenditure: instFin.reduce((s: number, f: any) => s + Number(f.expenditure || 0), 0) / 1e6,
+      name: county.name,
+      budget: countyFin.reduce((s: number, f: any) => s + Number(f.budget_allocated || 0), 0) / 1e6,
+      expenditure: countyFin.reduce((s: number, f: any) => s + Number(f.expenditure || 0), 0) / 1e6,
     }
-  })
+  }).sort((a: any, b: any) => b.budget - a.budget).slice(0, 10)
 
   // Infrastructure condition
   const infraCondition = infrastructure.reduce((acc: Record<string, number>, item: any) => {
@@ -375,12 +384,12 @@ export function DashboardView({
         {/* Enrolment by Institution */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Enrolment by Institution</CardTitle>
-            <CardDescription>Gender-disaggregated comparison</CardDescription>
+            <CardTitle className="text-sm font-medium">Enrolment by County</CardTitle>
+            <CardDescription>Top 10 counties — gender-disaggregated</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={enrolChartConfig} className="h-[260px] w-full">
-              <BarChart data={enrolByInst} margin={{ left: 0, right: 8, bottom: 40 }}>
+              <BarChart data={enrolByCounty} margin={{ left: 0, right: 8, bottom: 40 }}>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" />
                 <XAxis
                   dataKey="name"
@@ -407,12 +416,12 @@ export function DashboardView({
         {/* Capitation Expected vs Received */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Capitation: Expected vs Received</CardTitle>
-            <CardDescription>KES Millions by institution</CardDescription>
+            <CardTitle className="text-sm font-medium">Capitation by County</CardTitle>
+            <CardDescription>Top 10 counties — Expected vs Received (KES M)</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={capChartConfig} className="h-[260px] w-full">
-              <BarChart data={capByInst} margin={{ left: 0, right: 8, bottom: 40 }}>
+              <BarChart data={capByCounty} margin={{ left: 0, right: 8, bottom: 40 }}>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" />
                 <XAxis
                   dataKey="name"
@@ -441,12 +450,12 @@ export function DashboardView({
         {/* Budget Utilisation */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Budget Utilisation</CardTitle>
-            <CardDescription>Allocated vs Expenditure (KES M)</CardDescription>
+            <CardTitle className="text-sm font-medium">Budget Utilisation by County</CardTitle>
+            <CardDescription>Top 10 counties — Allocated vs Expenditure (KES M)</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={budgetChartConfig} className="h-[240px] w-full">
-              <AreaChart data={budgetData} margin={{ left: 0, right: 8, bottom: 40 }}>
+              <AreaChart data={budgetByCounty} margin={{ left: 0, right: 8, bottom: 40 }}>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" />
                 <XAxis
                   dataKey="name"
@@ -522,6 +531,13 @@ export function DashboardView({
         </Card>
       </div>
 
+      {/* ─── County Drill-Down Chart ───────────────────────────────────────── */}
+      <CountyDrillDown
+        counties={counties}
+        institutions={institutions}
+        enrolments={enrolments}
+      />
+
       {/* ─── Quick Stats Row ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat icon={MapPinIcon} label="Counties" value={counties.length.toString()} />
@@ -589,6 +605,122 @@ function MiniStat({
           <p className="text-xs text-muted-foreground">{label}</p>
           {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
         </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+// ─── County Drill-Down Chart ──────────────────────────────────────────────────
+
+const institutionChartConfig = {
+  male: { label: "Male", color: "oklch(0.65 0.22 350)" },
+  female: { label: "Female", color: "oklch(0.6 0.18 150)" },
+  pwd: { label: "PWD", color: "oklch(0.6 0.15 270)" },
+} satisfies ChartConfig
+
+function CountyDrillDown({
+  counties,
+  institutions,
+  enrolments,
+}: {
+  counties: any[]
+  institutions: any[]
+  enrolments: any[]
+}) {
+  const [selectedCounty, setSelectedCounty] = useState<string>(
+    counties.length > 0 ? counties[0].id?.toString() : ""
+  )
+
+  const countyInsts = institutions.filter(
+    (i: any) => (i.county_id?.toString() === selectedCounty) || (i.county?.id?.toString() === selectedCounty)
+  )
+
+  const chartData = countyInsts
+    .map((inst: any) => {
+      const instEnrolments = enrolments.filter((e: any) => e.institution_id === inst.id)
+      const male = instEnrolments.reduce((s: number, e: any) => s + (e.male_count || 0), 0)
+      const female = instEnrolments.reduce((s: number, e: any) => s + (e.female_count || 0), 0)
+      const pwd = instEnrolments.reduce((s: number, e: any) => s + (e.pwd_count || 0), 0)
+      return {
+        name: inst.name.length > 25 ? inst.name.slice(0, 25) + "…" : inst.name,
+        fullName: inst.name,
+        male,
+        female,
+        pwd,
+        total: male + female,
+      }
+    })
+    .sort((a: any, b: any) => b.total - a.total)
+
+  const selectedCountyName = counties.find((c: any) => c.id?.toString() === selectedCounty)?.name ?? ""
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-sm font-medium">Institutions in County</CardTitle>
+            <CardDescription>
+              Enrolment by institution — {selectedCountyName} ({countyInsts.length} institutions)
+            </CardDescription>
+          </div>
+          <Select value={selectedCounty} onValueChange={setSelectedCounty}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select county" />
+            </SelectTrigger>
+            <SelectContent>
+              {counties
+                .sort((a: any, b: any) => a.name.localeCompare(b.name))
+                .map((c: any) => (
+                  <SelectItem key={c.id} value={c.id.toString()}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {chartData.length === 0 ? (
+          <div className="flex items-center justify-center h-[300px] text-muted-foreground text-sm">
+            No institutions found in this county.
+          </div>
+        ) : (
+          <ChartContainer config={institutionChartConfig} className="h-[350px] w-full">
+            <BarChart
+              data={chartData}
+              margin={{ left: 0, right: 8, bottom: 80 }}
+              layout="horizontal"
+            >
+              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <XAxis
+                dataKey="name"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                angle={-35}
+                textAnchor="end"
+                height={100}
+                interval={0}
+                tick={{ fontSize: 10 }}
+              />
+              <YAxis tickLine={false} axisLine={false} tickMargin={8} width={45} />
+              <ChartTooltip
+                content={<ChartTooltipContent />}
+                labelFormatter={(_, payload) => {
+                  if (payload && payload[0]) {
+                    return (payload[0].payload as any).fullName
+                  }
+                  return ""
+                }}
+              />
+              <Legend verticalAlign="top" align="right" wrapperStyle={{ paddingBottom: 8 }} />
+              <Bar dataKey="male" name="Male" fill="var(--color-male)" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="female" name="Female" fill="var(--color-female)" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="pwd" name="PWD" fill="var(--color-pwd)" radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   )
