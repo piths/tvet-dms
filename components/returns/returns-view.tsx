@@ -56,7 +56,7 @@ interface ReturnRow {
   returned_reason: string | null
   institution_id: string
   institution: { id: string; name: string; type: string; county_id: number | null } | null
-  return_cycle: { name: string; period: string } | null
+  return_cycle: { id: string; name: string; period: string } | null
 }
 
 interface Props {
@@ -64,6 +64,7 @@ interface Props {
   counties: { id: number; name: string }[]
   institutions: { id: string; name: string }[]
   openCycle: any
+  allCycles: any[]
   userTier: UserTier
   userInstitutionId: string | null
   userId: string
@@ -84,6 +85,7 @@ export function ReturnsView({
   counties,
   institutions,
   openCycle,
+  allCycles,
   userTier,
   userInstitutionId,
   userId,
@@ -93,6 +95,7 @@ export function ReturnsView({
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [cycleFilter, setCycleFilter] = useState<string>(openCycle?.id ?? "all")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogAction, setDialogAction] = useState<"submit" | "verify" | "return" | null>(null)
   const [selectedReturn, setSelectedReturn] = useState<ReturnRow | null>(null)
@@ -107,6 +110,7 @@ export function ReturnsView({
   // County/Ministry: show all returns with filters
   const filteredReturns = returns.filter((r) => {
     if (statusFilter !== "all" && r.status !== statusFilter) return false
+    if (cycleFilter !== "all" && (r as any).return_cycle?.id !== cycleFilter) return false
     return true
   })
 
@@ -255,6 +259,19 @@ export function ReturnsView({
 
       {/* Filters */}
       <div className="flex gap-3">
+        <Select value={cycleFilter} onValueChange={setCycleFilter}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="All cycles" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Cycles</SelectItem>
+            {allCycles.map((c: any) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name} {c.is_open ? "(active)" : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="All statuses" />

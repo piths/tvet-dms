@@ -10,18 +10,18 @@ export default async function ReturnsPage() {
 
   const supabase = await createClient()
 
-  // Get the open cycle
-  const { data: openCycle } = await supabase
+  // Get all cycles (for the selector) and the open one
+  const { data: allCycles } = await supabase
     .from("return_cycle")
     .select("*")
-    .eq("is_open", true)
-    .limit(1)
-    .single()
+    .order("period", { ascending: false })
+
+  const openCycle = (allCycles ?? []).find((c: any) => c.is_open) ?? null
 
   // Get all returns with institution + cycle info
   const { data: returns } = await supabase
     .from("institution_return")
-    .select("*, institution:institution_id(id, name, type, county_id), return_cycle:cycle_id(name, period)")
+    .select("*, institution:institution_id(id, name, type, county_id), return_cycle:cycle_id(id, name, period)")
     .order("submitted_at", { ascending: false, nullsFirst: false })
 
   // Get counties for filter
@@ -50,7 +50,7 @@ export default async function ReturnsPage() {
     <>
       <PageHeader
         title="Returns"
-        description={openCycle ? `${openCycle.name} — ${openCycle.period}` : "No active cycle"}
+        description={openCycle ? `Active: ${openCycle.name} (${openCycle.period})` : "No active cycle"}
       />
       <div className="flex flex-1 flex-col gap-4 p-4 lg:p-6">
         <ReturnsView
@@ -58,6 +58,7 @@ export default async function ReturnsPage() {
           counties={counties ?? []}
           institutions={institutions ?? []}
           openCycle={openCycle}
+          allCycles={allCycles ?? []}
           userTier={session.appUser.tier}
           userInstitutionId={session.appUser.institution_id}
           userId={session.appUser.id}

@@ -42,6 +42,9 @@ import {
   MapPinIcon,
   AlertTriangleIcon,
 } from "lucide-react"
+import { useState } from "react"
+import { PeriodSelector } from "@/components/period-selector"
+import { getCurrentTerm, getCurrentQuarter, getCurrentFY } from "@/lib/periods"
 
 interface Props {
   enrolments: any[]
@@ -83,6 +86,9 @@ export function DashboardView({
   openCycle,
 }: Props) {
   // ─── Compute KPIs ──────────────────────────────────────────────────────────
+  const currentTerm = getCurrentTerm()
+  const [selectedPeriod, setSelectedPeriod] = useState(currentTerm.code)
+
   const totalEnrolment = enrolments.reduce((s, e) => s + (e.male_count || 0) + (e.female_count || 0), 0)
   const totalMale = enrolments.reduce((s, e) => s + (e.male_count || 0), 0)
   const totalFemale = enrolments.reduce((s, e) => s + (e.female_count || 0), 0)
@@ -187,6 +193,20 @@ export function DashboardView({
 
   return (
     <div className="space-y-6">
+      {/* ─── Period Selector ───────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <PeriodSelector
+            value={selectedPeriod}
+            onChange={setSelectedPeriod}
+            className="w-[220px]"
+          />
+          <p className="text-xs text-muted-foreground hidden sm:block">
+            Showing data for the selected period. Financial data follows the Kenya FY (Jul–Jun).
+          </p>
+        </div>
+      </div>
+
       {/* ─── KPI Cards Row ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-5">
         <KPICard
