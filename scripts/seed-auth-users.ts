@@ -8,16 +8,20 @@
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 import { resolve } from 'path'
+import ws from 'ws'
 
 dotenv.config({ path: resolve(__dirname, '../.env.local') })
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SECRET_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
+  {
+    auth: { autoRefreshToken: false, persistSession: false },
+    realtime: { transport: ws as any },
+  }
 )
 
-const DEMO_PASSWORD = 'Tvet@2026'
+const DEMO_PASSWORD = '123456'
 
 const users = [
   {
