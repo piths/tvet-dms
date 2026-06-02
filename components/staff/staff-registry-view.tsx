@@ -23,10 +23,8 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
-  SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
 import { UsersIcon, GraduationCapIcon, UserIcon } from "lucide-react"
 import { staffFullName } from "@/lib/types"
 
@@ -177,83 +175,82 @@ export function StaffRegistryView({ staff, counties, institutions, summary }: Pr
 
       {/* Staff Detail Sheet */}
       <Sheet open={!!selectedStaff} onOpenChange={() => setSelectedStaff(null)}>
-        <SheetContent className="sm:max-w-md overflow-y-auto">
+        <SheetContent className="sm:max-w-md overflow-y-auto p-0">
           {selectedStaff && (
             <>
-              <SheetHeader>
-                <SheetTitle>{staffFullName(selectedStaff)}</SheetTitle>
-                <SheetDescription className="flex items-center gap-2">
-                  <Badge variant="secondary">{selectedStaff.category}</Badge>
-                  {selectedStaff.job_group && (
-                    <Badge variant="outline">Job Group {selectedStaff.job_group}</Badge>
-                  )}
-                  {selectedStaff.status && (
-                    <Badge variant={selectedStaff.status === "active" ? "default" : "secondary"}>
-                      {selectedStaff.status}
-                    </Badge>
-                  )}
-                </SheetDescription>
-              </SheetHeader>
-
-              <div className="mt-6 space-y-6">
-                {/* Personal Information */}
-                <div>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                    Personal Information
-                  </h4>
-                  <dl className="grid grid-cols-2 gap-3 text-sm">
-                    <DetailField label="First Name" value={selectedStaff.first_name} />
-                    <DetailField label="Last Name" value={selectedStaff.last_name} />
-                    <DetailField label="Middle Name" value={selectedStaff.middle_name} />
-                    <DetailField label="Gender" value={selectedStaff.gender} />
-                    <DetailField label="Disability" value={selectedStaff.disability_status ? "Yes" : "No"} />
-                  </dl>
+              {/* Hero header with gradient + avatar */}
+              <div className="bg-gradient-to-br from-primary/15 via-primary/5 to-transparent p-6 pt-12">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xl font-bold">
+                    {`${selectedStaff.first_name?.[0] ?? ""}${selectedStaff.last_name?.[0] ?? ""}`.toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <SheetTitle className="text-lg leading-tight">{staffFullName(selectedStaff)}</SheetTitle>
+                    <p className="text-sm text-muted-foreground">{selectedStaff.designation ?? "—"}</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <Badge variant="secondary" className="capitalize">{selectedStaff.category}</Badge>
+                      {selectedStaff.job_group && (
+                        <Badge variant="outline">Group {selectedStaff.job_group}</Badge>
+                      )}
+                      {selectedStaff.status && (
+                        <Badge
+                          variant={selectedStaff.status === "active" ? "default" : "secondary"}
+                          className={selectedStaff.status === "active" ? "bg-green-600" : ""}
+                        >
+                          {selectedStaff.status}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
                 </div>
+                <SheetDescription className="sr-only">Staff member details</SheetDescription>
+              </div>
 
-                <Separator />
-
-                {/* Employment Details */}
+              {/* Quick facts strip */}
+              <div className="grid grid-cols-3 gap-2 border-y bg-muted/30 px-6 py-3 text-center">
                 <div>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                    Employment Details
-                  </h4>
-                  <dl className="grid grid-cols-2 gap-3 text-sm">
-                    <DetailField label="Employee Number" value={selectedStaff.employee_number} />
-                    <DetailField label="TSC Number" value={selectedStaff.tsc_number} />
-                    <DetailField label="CDACC Assessor No." value={selectedStaff.cdacc_assessor_number} />
-                    <DetailField label="Designation" value={selectedStaff.designation} />
-                    <DetailField label="Job Group" value={selectedStaff.job_group} />
-                    <DetailField label="Category" value={selectedStaff.category} />
-                    <DetailField label="Employment Type" value={selectedStaff.employment_type} />
-                    <DetailField label="Terms of Service" value={selectedStaff.terms_of_service} />
-                    <DetailField label="Date Joined" value={selectedStaff.date_joined} />
-                  </dl>
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Emp. No.</p>
+                  <p className="text-xs font-semibold truncate">{selectedStaff.employee_number ?? "—"}</p>
                 </div>
-
-                <Separator />
-
-                {/* Qualifications */}
+                <div className="border-x">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">TSC No.</p>
+                  <p className="text-xs font-semibold truncate">{selectedStaff.tsc_number ?? "—"}</p>
+                </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                    Qualifications
-                  </h4>
-                  <dl className="grid grid-cols-2 gap-3 text-sm">
-                    <DetailField label="Qualification Level" value={selectedStaff.qualification_level} />
-                  </dl>
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Joined</p>
+                  <p className="text-xs font-semibold truncate">
+                    {selectedStaff.date_joined ? new Date(selectedStaff.date_joined).getFullYear() : "—"}
+                  </p>
                 </div>
+              </div>
 
-                <Separator />
+              <div className="space-y-5 p-6">
+                <DetailSection title="Personal Information">
+                  <DetailField label="First Name" value={selectedStaff.first_name} />
+                  <DetailField label="Last Name" value={selectedStaff.last_name} />
+                  <DetailField label="Middle Name" value={selectedStaff.middle_name} />
+                  <DetailField label="Gender" value={selectedStaff.gender} />
+                  <DetailField label="Disability" value={selectedStaff.disability_status ? "Yes" : "No"} />
+                </DetailSection>
 
-                {/* Current Posting */}
-                <div>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                    Current Posting
-                  </h4>
-                  <dl className="grid grid-cols-2 gap-3 text-sm">
-                    <DetailField label="Institution" value={selectedStaff.institution?.name} />
-                    <DetailField label="County" value={selectedStaff.county?.name} />
-                  </dl>
-                </div>
+                <DetailSection title="Employment Details">
+                  <DetailField label="CDACC Assessor No." value={selectedStaff.cdacc_assessor_number} />
+                  <DetailField label="Designation" value={selectedStaff.designation} />
+                  <DetailField label="Job Group" value={selectedStaff.job_group} />
+                  <DetailField label="Category" value={selectedStaff.category} />
+                  <DetailField label="Employment Type" value={selectedStaff.employment_type} />
+                  <DetailField label="Terms of Service" value={selectedStaff.terms_of_service} />
+                  <DetailField label="Date Joined" value={selectedStaff.date_joined} />
+                </DetailSection>
+
+                <DetailSection title="Qualifications">
+                  <DetailField label="Qualification Level" value={selectedStaff.qualification_level} />
+                </DetailSection>
+
+                <DetailSection title="Current Posting">
+                  <DetailField label="Institution" value={selectedStaff.institution?.name} />
+                  <DetailField label="County" value={selectedStaff.county?.name} />
+                </DetailSection>
               </div>
             </>
           )}
@@ -263,11 +260,22 @@ export function StaffRegistryView({ staff, counties, institutions, summary }: Pr
   )
 }
 
+function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border bg-card p-4">
+      <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h4>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">{children}</dl>
+    </div>
+  )
+}
+
 function DetailField({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div>
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="font-medium mt-0.5">{value ?? "—"}</dd>
+      <dd className="font-medium mt-0.5 break-words">{value ?? "—"}</dd>
     </div>
   )
 }
